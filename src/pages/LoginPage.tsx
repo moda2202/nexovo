@@ -4,15 +4,31 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { GoogleLogin } from '@react-oauth/google';
 import { API_BASE } from "../config";
 
+/* ---- inline SVG icons ---- */
+const MailIcon = () => (
+    <svg className="auth-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
+);
+const LockIcon = () => (
+    <svg className="auth-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+);
+const EyeIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+);
+const EyeOffIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" /><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" /><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" /><line x1="2" x2="22" y1="2" y2="22" /></svg>
+);
+
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPw, setShowPw] = useState(false);
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const { login } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
-
+    const successMessage = location.state?.message;
 
     const handleGoogleSuccess = async (credentialResponse: any) => {
         try {
@@ -21,114 +37,107 @@ export default function LoginPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ credential: credentialResponse.credential }),
             });
-
             if (!response.ok) throw new Error("Google Login Failed");
-
             const data = await response.json();
-            login(data.accessToken); // حفظ التوكن
-            navigate("/community"); // تحويل للمجتمع
-
-        } catch (err) {
+            login(data.accessToken);
+            navigate("/community");
+        } catch {
             setError("Google login failed. Please try again.");
         }
     };
-    // نقرأ الرسالة القادمة من صفحة التسجيل (إن وجدت)
-    const successMessage = location.state?.message;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
-
+        setLoading(true);
         try {
             const response = await fetch(`${API_BASE}/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
-
-            if (!response.ok) {
-                throw new Error("Login failed! Check your email or password.");
-            }
-
+            if (!response.ok) throw new Error("Login failed! Check your email or password.");
             const data = await response.json();
-
-            // حفظ التوكن
             login(data.accessToken);
-
-            // توجيه المستخدم لصفحة المجتمع
             navigate("/community");
-
         } catch (err: any) {
             setError(err.message);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="page-center">
-            <div className="card glass" style={{ maxWidth: "400px", width: "100%", padding: "2rem" }}>
-                <h2 style={{ marginBottom: "1.5rem" }}>Login to Community 🚀</h2>
+            <div className="auth-card">
 
-                {/* 👇 هنا بنعرض رسالة النجاح إذا كانت موجودة */}
+                {/* Header */}
+                <div className="auth-header">
+                    <div className="auth-logo">🚀</div>
+                    <h2 className="auth-title">Welcome Back</h2>
+                    <p className="auth-subtitle">Sign in to access the community</p>
+                </div>
+
+                {/* Success message from Register */}
                 {successMessage && (
-                    <div style={{
-                        backgroundColor: "rgba(46, 213, 115, 0.1)",
-                        border: "1px solid #2ed573",
-                        color: "#2ed573",
-                        padding: "0.75rem",
-                        borderRadius: "8px",
-                        marginBottom: "1.5rem",
-                        fontSize: "0.9rem",
-                        textAlign: "center",
-                        lineHeight: "1.4"
-                    }}>
-                        {successMessage}
-                    </div>
+                    <div className="auth-success">✅ {successMessage}</div>
                 )}
 
-                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    <div>
-                        <label style={{ display: "block", marginBottom: "0.5rem" }}>Email</label>
+                {/* Error */}
+                {error && <div className="auth-error">⚠️ {error}</div>}
+
+                {/* Google */}
+                <div className="auth-google-wrap">
+                    <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={() => setError("Google Login Failed")}
+                        theme="filled_black"
+                        shape="pill"
+                        size="large"
+                        width="320"
+                    />
+                </div>
+
+                <div className="auth-divider">or</div>
+
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="auth-form">
+                    <div className="auth-field">
+                        <MailIcon />
                         <input
                             type="email"
+                            className="auth-input"
+                            placeholder="Email address"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            style={{ width: "100%", padding: "0.5rem", borderRadius: "4px", border: "1px solid #444", background: "#222", color: "#fff" }}
+                            autoComplete="email"
                         />
                     </div>
 
-                    <div>
-                        <label style={{ display: "block", marginBottom: "0.5rem" }}>Password</label>
+                    <div className="auth-field">
+                        <LockIcon />
                         <input
-                            type="password"
+                            type={showPw ? "text" : "password"}
+                            className="auth-input"
+                            placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            style={{ width: "100%", padding: "0.5rem", borderRadius: "4px", border: "1px solid #444", background: "#222", color: "#fff" }}
+                            autoComplete="current-password"
                         />
+                        <button type="button" className="auth-toggle-pw" onClick={() => setShowPw(!showPw)} tabIndex={-1}>
+                            {showPw ? <EyeOffIcon /> : <EyeIcon />}
+                        </button>
                     </div>
 
-                    {error && <div style={{ color: "#ff6b6b", fontSize: "0.9rem" }}>{error}</div>}
-
-                    <button
-                        type="submit"
-                        style={{ marginTop: "1rem", padding: "0.75rem", background: "#007bff", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}
-                    >
-                        Sign In
+                    <button type="submit" className="auth-btn" disabled={loading}>
+                        {loading ? <><span className="auth-spinner" /> Signing in...</> : "Sign In"}
                     </button>
-                    <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
-                        <GoogleLogin
-                            onSuccess={handleGoogleSuccess}
-                            onError={() => { setError("Google Login Failed"); }}
-                            theme="filled_black"
-                            shape="pill"
-                        />
-                    </div>
-                    <div style={{ textAlign: "center", color: "#666", margin: "0.5rem 0" }}>OR</div>
                 </form>
 
-                <div style={{ textAlign: "center", marginTop: "1rem", fontSize: "0.9rem" }}>
-                    Don't have an account? <Link to="/register" style={{ color: "#007bff" }}>Register here</Link>
+                <div className="auth-footer">
+                    Don't have an account? <Link to="/register">Create one</Link>
                 </div>
             </div>
         </div>
