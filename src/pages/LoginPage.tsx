@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { GoogleLogin } from '@react-oauth/google';
 import { API_BASE } from "../config";
+import { AuthHeader } from "../components/layout/AuthHeader";
 
 /* ---- inline SVG icons ---- */
 const MailIcon = () => (
@@ -68,78 +69,81 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="page-center">
-            <div className="auth-card">
+        <>
+            <AuthHeader />
+            <div className="page-center">
+                <div className="auth-card">
 
-                {/* Header */}
-                <div className="auth-header">
-                    <div className="auth-logo">🚀</div>
-                    <h2 className="auth-title">Welcome Back</h2>
-                    <p className="auth-subtitle">Sign in to access the community</p>
-                </div>
+                    {/* Header */}
+                    <div className="auth-header">
+                        <div className="auth-logo">🚀</div>
+                        <h2 className="auth-title">Welcome Back</h2>
+                        <p className="auth-subtitle">Sign in to access the community</p>
+                    </div>
 
-                {/* Success message from Register */}
-                {successMessage && (
-                    <div className="auth-success">✅ {successMessage}</div>
-                )}
+                    {/* Success message from Register */}
+                    {successMessage && (
+                        <div className="auth-success">✅ {successMessage}</div>
+                    )}
 
-                {/* Error */}
-                {error && <div className="auth-error">⚠️ {error}</div>}
+                    {/* Error */}
+                    {error && <div className="auth-error">⚠️ {error}</div>}
 
-                {/* Google */}
-                <div className="auth-google-wrap">
-                    <GoogleLogin
-                        onSuccess={handleGoogleSuccess}
-                        onError={() => setError("Google Login Failed")}
-                        theme="filled_black"
-                        shape="pill"
-                        size="large"
-                        width="320"
-                    />
-                </div>
-
-                <div className="auth-divider">or</div>
-
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="auth-field">
-                        <MailIcon />
-                        <input
-                            type="email"
-                            className="auth-input"
-                            placeholder="Email address"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            autoComplete="email"
+                    {/* Google */}
+                    <div className="auth-google-wrap">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={() => setError("Google Login Failed")}
+                            theme="filled_black"
+                            shape="pill"
+                            size="large"
+                            width="320"
                         />
                     </div>
 
-                    <div className="auth-field">
-                        <LockIcon />
-                        <input
-                            type={showPw ? "text" : "password"}
-                            className="auth-input"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            autoComplete="current-password"
-                        />
-                        <button type="button" className="auth-toggle-pw" onClick={() => setShowPw(!showPw)} tabIndex={-1}>
-                            {showPw ? <EyeOffIcon /> : <EyeIcon />}
+                    <div className="auth-divider">or</div>
+
+                    {/* Form */}
+                    <form onSubmit={handleSubmit} className="auth-form">
+                        <div className="auth-field">
+                            <MailIcon />
+                            <input
+                                type="email"
+                                className="auth-input"
+                                placeholder="Email address"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                autoComplete="email"
+                            />
+                        </div>
+
+                        <div className="auth-field">
+                            <LockIcon />
+                            <input
+                                type={showPw ? "text" : "password"}
+                                className="auth-input"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                autoComplete="current-password"
+                            />
+                            <button type="button" className="auth-toggle-pw" onClick={() => setShowPw(!showPw)} tabIndex={-1}>
+                                {showPw ? <EyeOffIcon /> : <EyeIcon />}
+                            </button>
+                        </div>
+
+                        <button type="submit" className="auth-btn" disabled={loading}>
+                            {loading ? <><span className="auth-spinner" /> Signing in...</> : "Sign In"}
                         </button>
+                    </form>
+
+                    <div className="auth-footer">
+                        Don't have an account? <Link to="/register">Create one</Link>
                     </div>
-
-                    <button type="submit" className="auth-btn" disabled={loading}>
-                        {loading ? <><span className="auth-spinner" /> Signing in...</> : "Sign In"}
-                    </button>
-                </form>
-
-                <div className="auth-footer">
-                    Don't have an account? <Link to="/register">Create one</Link>
                 </div>
             </div>
-        </div>
+        </>
     );
 }

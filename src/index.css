@@ -670,6 +670,28 @@ a:hover {
   }
 }
 
+/* ===== AUTH TOPBAR NAV ===== */
+.auth-topbar-nav {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.auth-topbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.auth-topbar-nav .nav-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
 /* ===== AUTH PAGES ===== */
 @keyframes authFadeIn {
   from {

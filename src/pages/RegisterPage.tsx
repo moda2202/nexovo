@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { API_BASE } from "../config";
+import { AuthHeader } from "../components/layout/AuthHeader";
 
 /* ---- inline SVG icons ---- */
 const UserIcon = () => (
@@ -82,106 +83,109 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="page-center">
-      <div className="auth-card">
+    <>
+      <AuthHeader />
+      <div className="page-center">
+        <div className="auth-card">
 
-        {/* Header */}
-        <div className="auth-header">
-          <div className="auth-logo">✨</div>
-          <h2 className="auth-title">Create Account</h2>
-          <p className="auth-subtitle">Join the DynamicCV community</p>
-        </div>
-
-        {/* Error */}
-        {error && <div className="auth-error">⚠️ {error}</div>}
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="auth-form">
-
-          {/* Name row */}
-          <div className="auth-row">
-            <div className="auth-field">
-              <UserIcon />
-              <input
-                name="firstName"
-                className="auth-input"
-                placeholder="First name"
-                onChange={handleChange}
-                required
-                autoComplete="given-name"
-              />
-            </div>
-            <div className="auth-field">
-              <UserIcon />
-              <input
-                name="lastName"
-                className="auth-input"
-                placeholder="Last name"
-                onChange={handleChange}
-                required
-                autoComplete="family-name"
-              />
-            </div>
+          {/* Header */}
+          <div className="auth-header">
+            <div className="auth-logo">✨</div>
+            <h2 className="auth-title">Create Account</h2>
+            <p className="auth-subtitle">Join the DynamicCV community</p>
           </div>
 
-          {/* Email */}
-          <div className="auth-field">
-            <MailIcon />
-            <input
-              name="email"
-              type="email"
-              className="auth-input"
-              placeholder="Email address"
-              onChange={handleChange}
-              required
-              autoComplete="email"
-            />
-          </div>
+          {/* Error */}
+          {error && <div className="auth-error">⚠️ {error}</div>}
 
-          {/* Password */}
-          <div className="auth-field">
-            <LockIcon />
-            <input
-              name="password"
-              type={showPw ? "text" : "password"}
-              className="auth-input"
-              placeholder="Create a strong password"
-              onChange={handleChange}
-              required
-              autoComplete="new-password"
-            />
-            <button type="button" className="auth-toggle-pw" onClick={() => setShowPw(!showPw)} tabIndex={-1}>
-              {showPw ? <EyeOffIcon /> : <EyeIcon />}
-            </button>
-          </div>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="auth-form">
 
-          {/* Password strength */}
-          {formData.password && (
-            <>
-              <div className="pw-strength-bar">
-                <div
-                  className="pw-strength-fill"
-                  style={{
-                    width: `${(pwStrength.score / 5) * 100}%`,
-                    background: pwStrength.color,
-                  }}
+            {/* Name row */}
+            <div className="auth-row">
+              <div className="auth-field">
+                <UserIcon />
+                <input
+                  name="firstName"
+                  className="auth-input"
+                  placeholder="First name"
+                  onChange={handleChange}
+                  required
+                  autoComplete="given-name"
                 />
               </div>
-              <div className="pw-strength-text" style={{ color: pwStrength.color }}>
-                {pwStrength.label}
+              <div className="auth-field">
+                <UserIcon />
+                <input
+                  name="lastName"
+                  className="auth-input"
+                  placeholder="Last name"
+                  onChange={handleChange}
+                  required
+                  autoComplete="family-name"
+                />
               </div>
-            </>
-          )}
+            </div>
 
-          <button type="submit" className="auth-btn green" disabled={loading}>
-            {loading ? <><span className="auth-spinner" /> Creating account...</> : "Create Account"}
-          </button>
-        </form>
+            {/* Email */}
+            <div className="auth-field">
+              <MailIcon />
+              <input
+                name="email"
+                type="email"
+                className="auth-input"
+                placeholder="Email address"
+                onChange={handleChange}
+                required
+                autoComplete="email"
+              />
+            </div>
 
-        <div className="auth-footer">
-          Already have an account? <Link to="/login">Sign in</Link>
+            {/* Password */}
+            <div className="auth-field">
+              <LockIcon />
+              <input
+                name="password"
+                type={showPw ? "text" : "password"}
+                className="auth-input"
+                placeholder="Create a strong password"
+                onChange={handleChange}
+                required
+                autoComplete="new-password"
+              />
+              <button type="button" className="auth-toggle-pw" onClick={() => setShowPw(!showPw)} tabIndex={-1}>
+                {showPw ? <EyeOffIcon /> : <EyeIcon />}
+              </button>
+            </div>
+
+            {/* Password strength */}
+            {formData.password && (
+              <>
+                <div className="pw-strength-bar">
+                  <div
+                    className="pw-strength-fill"
+                    style={{
+                      width: `${(pwStrength.score / 5) * 100}%`,
+                      background: pwStrength.color,
+                    }}
+                  />
+                </div>
+                <div className="pw-strength-text" style={{ color: pwStrength.color }}>
+                  {pwStrength.label}
+                </div>
+              </>
+            )}
+
+            <button type="submit" className="auth-btn green" disabled={loading}>
+              {loading ? <><span className="auth-spinner" /> Creating account...</> : "Create Account"}
+            </button>
+          </form>
+
+          <div className="auth-footer">
+            Already have an account? <Link to="/login">Sign in</Link>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
