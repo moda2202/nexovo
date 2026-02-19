@@ -138,7 +138,20 @@ export default function LoginPage() {
                                 {showPw ? <EyeOffIcon /> : <EyeIcon />}
                             </button>
                         </div>
-
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-8px', marginBottom: '20px' }}>
+                            <Link 
+                                to="/forgot-password" 
+                                style={{ 
+                                    fontSize: '13px', 
+                                    color: '#a855f7', // لون بنفسجي متناسق مع ثيم Nexovo
+                                    textDecoration: 'none',
+                                    fontWeight: '500',
+                                    letterSpacing: '0.3px'
+                                }}
+                            >
+                                Forgot password?
+                            </Link>
+                        </div>
                         <button type="submit" className="auth-btn" disabled={loading}>
                             {loading ? <><span className="auth-spinner" /> {t('login_signing_in', 'Signing in...')}</> : t('login_sign_in_btn', 'Sign In')}
                         </button>

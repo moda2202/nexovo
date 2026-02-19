@@ -9,7 +9,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import { MoneyManagerPage } from "./pages/MoneyManagerPage";
 import { RequireAuth } from "./routes/RequireAuth";
 import { MonthDetailsPage } from "./pages/MonthDetailsPage";
-
+import  ForgotPassword  from "./pages/ForgotPassword";
+import  ResetPassword  from "./pages/ResetPassword";
 
 export default function App() {
   const baseUrl = import.meta.env.BASE_URL;
@@ -18,10 +19,8 @@ export default function App() {
     <AuthProvider>
       <Router basename={baseUrl}>
         <Routes>
-          {/* 👇 1. المنصة (Nexovo) صارت هي الواجهة الرئيسية للموقع */}
           <Route path="/" element={<CommunityPage />} />
 
-          {/* 👇 2. السيرة الذاتية صار إلها رابط فرعي فخم */}
           <Route path="/cv" element={<HomePage />} />
 
           <Route path="/login" element={<LoginPage />} />
@@ -45,7 +44,8 @@ export default function App() {
           />
 
           <Route path="/admin" element={<AdminDashboard />} />
-          
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Routes>
       </Router>
     </AuthProvider>

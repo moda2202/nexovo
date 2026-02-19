@@ -56,6 +56,28 @@ export default function AdminDashboard() {
     fetchUsers(searchTerm);
   };
 
+
+
+  const deleteUser = async (userId: string) => {
+    if (!confirm("⚠️ Are you ABSOLUTELY sure? This will permanently delete the user and cannot be undone!")) return;
+
+    try {
+      const response = await fetch(`${API_BASE}/api/admin/delete/${userId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        // تحديث الجدول فوراً بحذف المستخدم منه
+        setUsers(users.filter(u => u.id !== userId));
+      } else {
+        alert("Failed to delete user");
+      }
+    } catch (error) {
+      alert("Error connecting to server");
+    }
+  };
+
   const toggleBan = async (userId: string) => {
     if (!confirm("Are you sure you want to change this user's status?")) return;
 
@@ -88,7 +110,6 @@ export default function AdminDashboard() {
             <p className="hero-title">Manage users and content</p>
           </div>
 
-          {/* 👇 قسم البحث: ضفنا flexWrap و flex: 1 عشان يتجاوب مع الموبايل */}
           <div className="card" style={{ marginBottom: '20px', padding: '15px' }}>
             <form onSubmit={handleSearch} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <input 
@@ -142,22 +163,41 @@ export default function AdminDashboard() {
                           <span className="badge" style={{ background: 'rgba(34, 197, 94, 0.2)', color: '#86efac', whiteSpace: 'nowrap' }}>Active ✅</span>
                         )}
                       </td>
-                      <td style={{ padding: '16px', textAlign: 'right' }}>
+                      {/* 👇 قسم الأزرار بعد التعديل لظهور زر الحذف */}
+                      <td style={{ padding: '16px', textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                         {u.email !== user?.email && (
-                          <button 
-                            onClick={() => toggleBan(u.id)}
-                            className="btn"
-                            style={{ 
-                              fontSize: '13px', 
-                              padding: '6px 12px',
-                              background: u.isBanned ? '#22c55e' : '#ef4444',
-                              color: 'white',
-                              border: 'none',
-                              whiteSpace: 'nowrap'
-                            }}
-                          >
-                            {u.isBanned ? "Unban User" : "Ban User"}
-                          </button>
+                          <>
+                            <button 
+                              onClick={() => toggleBan(u.id)}
+                              className="btn"
+                              style={{ 
+                                fontSize: '13px', 
+                                padding: '6px 12px',
+                                background: u.isBanned ? '#22c55e' : '#f59e0b', // غيرنا لون الباند للبرتقالي
+                                color: 'white',
+                                border: 'none',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              {u.isBanned ? "Unban" : "Ban"}
+                            </button>
+
+                            <button 
+                              onClick={() => deleteUser(u.id)}
+                              className="btn"
+                              style={{ 
+                                fontSize: '13px', 
+                                padding: '6px 12px',
+                                background: '#ef4444',
+                                color: 'white',
+                                border: 'none',
+                                whiteSpace: 'nowrap'
+                              }}
+                              title="Delete permanently"
+                            >
+                              Delete 🗑️
+                            </button>
+                          </>
                         )}
                       </td>
                     </tr>
