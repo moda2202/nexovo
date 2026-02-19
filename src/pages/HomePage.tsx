@@ -130,6 +130,8 @@ export default function HomePage() {
         certificate={selectedCert}
         onClose={() => setSelectedCert(null)}
       />
+          <script async defer src="https://www.uchat.com.au/js/widget/qlp5hytocjbz8dfy/float.js"></script>
+
     </div>
   );
 }

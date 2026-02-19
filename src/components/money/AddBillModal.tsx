@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { useMoneyManager } from "../../hooks/useMoneyManager";
 import type { Bill } from "../../types/money";
 
+// 👇 استيراد مكتبة الترجمة
+import { useTranslation } from "react-i18next";
+
 interface Props {
     isOpen: boolean;
     onClose: () => void;
@@ -12,6 +15,9 @@ interface Props {
 
 export function AddBillModal({ isOpen, onClose, onSuccess, financialMonthId, initialData }: Props) {
     const { addBill, updateBill, loading } = useMoneyManager();
+    
+    // 👇 تفعيل الترجمة
+    const { t } = useTranslation();
     
     const [type, setType] = useState("");
     const [amount, setAmount] = useState("");
@@ -26,12 +32,11 @@ export function AddBillModal({ isOpen, onClose, onSuccess, financialMonthId, ini
             setType(initialData.type);
             setAmount(initialData.amount.toString());
             setDescription(initialData.description || "");
-            setColor(initialData.color || "#60a5fa"); // 👈 جلب اللون لو كان موجود بتعديل الفاتورة
+            setColor(initialData.color || "#60a5fa");
         } else {
             setType("");
             setAmount("");
             setDescription("");
-            // 👈 إعطاء لون عشوائي للفاتورة الجديدة كقيمة افتراضية
             setColor(defaultColors[Math.floor(Math.random() * defaultColors.length)]);
         }
         setError("");
@@ -43,21 +48,19 @@ export function AddBillModal({ isOpen, onClose, onSuccess, financialMonthId, ini
         e.preventDefault();
         setError("");
 
-        // 1. تنظيف النص
         const cleanType = type.trim();
         const cleanDescription = description.trim();
 
-        // 2. التحقق من الطول
         if (cleanType.length < 2 || cleanType.length > 30) {
-            setError("Category name must be between 2 and 30 characters.");
+            // 👇 ترجمة خطأ الطول
+            setError(t('mm_add_bill_err_length', "Category name must be between 2 and 30 characters."));
             return;
         }
 
-        // 3. التحقق من الرموز (نفس الـ Regex الموجود في الباك إند)
-        // يقبل فقط: أحرف إنجليزية، أحرف عربية، أرقام، ومسافات. يمنع الرموز الخبيثة.
         const isValidCategory = /^[\w\s\u0600-\u06FF]+$/.test(cleanType);
         if (!isValidCategory) {
-            setError("Invalid characters! Please use only letters and numbers (e.g., Food, Gym).");
+            // 👇 ترجمة خطأ الرموز الممنوعة
+            setError(t('mm_add_bill_err_chars', "Invalid characters! Please use only letters and numbers (e.g., Food, Gym)."));
             return;
         }
 
@@ -67,7 +70,7 @@ export function AddBillModal({ isOpen, onClose, onSuccess, financialMonthId, ini
                 type: cleanType,
                 amount: Number(amount),
                 description: cleanDescription,
-                color // 👈 إرسال اللون الجديد مع البيانات
+                color 
             };
 
             if (initialData) {
@@ -79,8 +82,8 @@ export function AddBillModal({ isOpen, onClose, onSuccess, financialMonthId, ini
             onSuccess();
             onClose();
         } catch (err: any) {
-            // إذا أفلت الخطأ من الفرونت إند ورفضه الباك إند
-            setError(err.message || "Operation failed. Please check your inputs.");
+            // 👇 ترجمة خطأ السيرفر
+            setError(err.message || t('mm_add_bill_err_op', "Operation failed. Please check your inputs."));
         }
     };
 
@@ -88,22 +91,24 @@ export function AddBillModal({ isOpen, onClose, onSuccess, financialMonthId, ini
         <div className="modal-backdrop">
             <div className="modal">
                 <div className="modal-head">
-                    <h3 className="modal-title">{initialData ? "✏️ Edit Expense" : "💸 Add Expense"}</h3>
-                    <button type="button" onClick={onClose} className="small-btn">✕</button>
+                    <h3 className="modal-title">
+                        {/* 👇 ترجمة العنوان */}
+                        {initialData ? t('mm_add_bill_edit_title', "✏️ Edit Expense") : t('mm_add_bill_new_title', "💸 Add Expense")}
+                    </h3>
+                    <button type="button" onClick={onClose} className="small-btn" title={t('comm_cancel_btn', 'Cancel')}>✕</button>
                 </div>
 
                 {error && <div className="auth-error">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="auth-form" style={{ marginTop: '20px' }}>
                     
-                    {/* 👇 دمجنا الاسم واللون ليكونوا متجاورين بدون تخريب التنسيق */}
                     <div style={{ display: 'flex', gap: '15px' }}>
                         <div className="auth-field" style={{ flex: '1' }}>
-                            {/* أيقونة المساعدة بجانب الـ Label محفوظة كما هي */}
                             <label className="muted small" style={{ marginBottom: '5px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                Category Name
+                                {/* 👇 ترجمة اسم الصنف */}
+                                {t('mm_add_bill_category_label', "Category Name")}
                                 <span 
-                                    title="Suggestions: Food, Home, Car, Shopping, Gym, Health, Bills, Internet" 
+                                    title={t('mm_add_bill_category_hint', "Suggestions: Food, Home, Car, Shopping, Gym, Health, Bills, Internet")} 
                                     style={{ 
                                         cursor: 'help', 
                                         display: 'inline-flex', 
@@ -124,7 +129,7 @@ export function AddBillModal({ isOpen, onClose, onSuccess, financialMonthId, ini
                             <input 
                                 type="text" 
                                 className="auth-input" 
-                                placeholder="e.g. Groceries, Gym"
+                                placeholder={t('mm_add_bill_category_placeholder', "e.g. Groceries, Gym")}
                                 value={type} 
                                 onChange={(e) => setType(e.target.value)} 
                                 maxLength={30} 
@@ -132,26 +137,31 @@ export function AddBillModal({ isOpen, onClose, onSuccess, financialMonthId, ini
                             />
                         </div>
 
-                        {/* 👇 حقل اختيار اللون الجديد */}
                         <div className="auth-field" style={{ width: '60px' }}>
-                            <label className="muted small" style={{ marginBottom: '5px', display: 'block' }}>Color</label>
+                            <label className="muted small" style={{ marginBottom: '5px', display: 'block' }}>
+                                {/* 👇 ترجمة اللون */}
+                                {t('mm_add_bill_color_label', "Color")}
+                            </label>
                             <input 
                                 type="color" 
                                 className="auth-input" 
                                 value={color} 
                                 onChange={(e) => setColor(e.target.value)} 
                                 style={{ padding: '0', height: '42px', cursor: 'pointer', borderRadius: '8px', border: 'none' }}
-                                title="Choose a color"
+                                title={t('mm_add_bill_color_title', "Choose a color")}
                             />
                         </div>
                     </div>
 
                     <div className="auth-field">
-                        <label className="muted small" style={{ marginBottom: '5px', display: 'block' }}>Amount (kr)</label>
+                        <label className="muted small" style={{ marginBottom: '5px', display: 'block' }}>
+                            {/* 👇 ترجمة المبلغ */}
+                            {t('mm_add_bill_amount_label', "Amount (kr)")}
+                        </label>
                         <input 
                             type="number" 
                             className="auth-input" 
-                            placeholder="e.g. 500"
+                            placeholder={t('mm_add_bill_amount_placeholder', "e.g. 500")}
                             value={amount} 
                             onChange={(e) => setAmount(e.target.value)} 
                             required 
@@ -159,11 +169,14 @@ export function AddBillModal({ isOpen, onClose, onSuccess, financialMonthId, ini
                     </div>
 
                     <div className="auth-field">
-                        <label className="muted small" style={{ marginBottom: '5px', display: 'block' }}>Description (Optional)</label>
+                        <label className="muted small" style={{ marginBottom: '5px', display: 'block' }}>
+                            {/* 👇 ترجمة الوصف */}
+                            {t('mm_add_bill_desc_label', "Description (Optional)")}
+                        </label>
                         <input 
                             type="text" 
                             className="auth-input" 
-                            placeholder="e.g. Weekly shopping"
+                            placeholder={t('mm_add_bill_desc_placeholder', "e.g. Weekly shopping")}
                             value={description} 
                             onChange={(e) => setDescription(e.target.value)} 
                             maxLength={150} 
@@ -171,9 +184,14 @@ export function AddBillModal({ isOpen, onClose, onSuccess, financialMonthId, ini
                     </div>
 
                     <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-                        <button type="button" onClick={onClose} className="btn ghost" style={{ flex: 1 }}>Cancel</button>
+                        <button type="button" onClick={onClose} className="btn ghost" style={{ flex: 1 }}>
+                            {t('mm_add_month_cancel', "Cancel")}
+                        </button>
                         <button type="submit" className="btn primary-btn" disabled={loading} style={{ flex: 1 }}>
-                            {loading ? "Processing..." : (initialData ? "Update Bill" : "Add Bill")}
+                            {/* 👇 ترجمة أزرار الحفظ */}
+                            {loading 
+                                ? t('mm_add_bill_processing', "Processing...") 
+                                : (initialData ? t('mm_add_bill_update', "Update Bill") : t('mm_add_bill_add', "Add Bill"))}
                         </button>
                     </div>
                 </form>

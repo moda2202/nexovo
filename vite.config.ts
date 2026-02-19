@@ -18,5 +18,5 @@ function spa404Plugin() {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), spa404Plugin()],
-  base: "/firas-cv/",
+  base: "/nexovo/",
 })

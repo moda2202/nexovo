@@ -30,12 +30,14 @@ export function AuthHeader() {
 
     return (
         <header className="topbar">
-            {/* 1. Left: Brand / Logo */}
+            {/* 1. Left: Brand / Logo - التعديل الجديد لبراند Nexovo */}
             <Link to="/" className="brand" style={{ textDecoration: "none" }}>
-                <div className="logo">CV</div>
+                <div className="logo" style={{ background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', color: '#fff', border: 'none' }}>
+                    N
+                </div>
                 <div>
-                    <div className="brand-title">Firas CV</div>
-                    <span className="brand-sub">Full Stack Dev</span>
+                    <div className="brand-title" style={{ letterSpacing: '1px' }}>NEXOVO</div>
+                    <span className="brand-sub">By Firas Darwich</span>
                 </div>
             </Link>
 
@@ -53,20 +55,22 @@ export function AuthHeader() {
 
                 {/* 2. Center: Navigation Links */}
                 <nav className="nav-center">
+                    {/* 👇 الواجهة الرئيسية صارت المنصة */}
                     <Link
                         to="/"
                         className={`nav-link ${isActive("/") ? "active" : ""}`}
                         onClick={() => setMobileMenuOpen(false)}
                     >
-                        {/* 👇 3. استبدال النصوص الثابتة بالترجمة */}
-                        {t('nav_resume', 'CV Resume')}
+                        {t('nav_community', 'Nexovo Hub')} 🌍
                     </Link>
+
+                    {/* 👇 السي في صار صفحة فرعية */}
                     <Link
-                        to="/community"
-                        className={`nav-link ${isActive("/community") ? "active" : ""}`}
+                        to="/cv"
+                        className={`nav-link ${isActive("/cv") ? "active" : ""}`}
                         onClick={() => setMobileMenuOpen(false)}
                     >
-                        {t('nav_community', 'Community')}
+                        {t('nav_resume', 'My CV')} 📄
                     </Link>
 
                     {token && (

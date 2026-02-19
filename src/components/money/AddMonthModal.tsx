@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { useMoneyManager } from "../../hooks/useMoneyManager";
 import type { DashboardItem } from "../../types/money";
 
+// 👇 استيراد مكتبة الترجمة
+import { useTranslation } from "react-i18next";
+
 interface Props {
     isOpen: boolean;
     onClose: () => void;
@@ -11,13 +14,15 @@ interface Props {
 
 export function AddMonthModal({ isOpen, onClose, onSuccess, initialData }: Props) {
     const { createMonth, updateMonth, loading } = useMoneyManager();
+    
+    // 👇 تفعيل الترجمة
+    const { t } = useTranslation();
 
-    // سنستخدم متغير واحد للتاريخ بصيغة "YYYY-MM"
     const [dateValue, setDateValue] = useState("");
     const [income, setIncome] = useState("");
     const [error, setError] = useState("");
 
-    // مصفوفة مساعدة لتحويل رقم الشهر لاسم (لأن الباك إند عندك بيطلب الاسم text)
+    // مصفوفة مساعدة لتحويل رقم الشهر لاسم (تبقى بالإنجليزي من أجل الـ Backend)
     const monthNames = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
@@ -26,19 +31,15 @@ export function AddMonthModal({ isOpen, onClose, onSuccess, initialData }: Props
     useEffect(() => {
         if (isOpen) {
             if (initialData) {
-                // حالة التعديل: نحول "February" و 2026 إلى "2026-02" ليفهمها الانبوت
                 const monthIndex = monthNames.indexOf(initialData.month);
-                const monthNumber = String(monthIndex + 1).padStart(2, '0'); // يحول 2 إلى "02"
+                const monthNumber = String(monthIndex + 1).padStart(2, '0');
                 setDateValue(`${initialData.year}-${monthNumber}`);
-
                 setIncome(initialData.totalIncome.toString());
             } else {
-                // حالة الإضافة: نضع التاريخ الحالي افتراضياً
                 const now = new Date();
                 const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
                 const currentYear = now.getFullYear();
                 setDateValue(`${currentYear}-${currentMonth}`);
-
                 setIncome("");
             }
             setError("");
@@ -52,15 +53,15 @@ export function AddMonthModal({ isOpen, onClose, onSuccess, initialData }: Props
         setError("");
 
         if (!dateValue) {
-            setError("Please select a valid month and year.");
+            // 👇 ترجمة رسالة الخطأ
+            setError(t('mm_add_month_err_date', "Please select a valid month and year."));
             return;
         }
 
         try {
-            // هنا السحر: نفكك التاريخ "2026-02" لنرسله للباك إند
             const [yearStr, monthStr] = dateValue.split("-");
             const selectedYear = Number(yearStr);
-            const selectedMonthName = monthNames[Number(monthStr) - 1]; // نحول "02" إلى "February"
+            const selectedMonthName = monthNames[Number(monthStr) - 1];
 
             if (initialData) {
                 await updateMonth(initialData.id, {
@@ -78,7 +79,8 @@ export function AddMonthModal({ isOpen, onClose, onSuccess, initialData }: Props
             onSuccess();
             onClose();
         } catch (err: any) {
-            setError(err.message || "Operation failed");
+            // 👇 ترجمة رسالة الخطأ في حال فشل السيرفر
+            setError(err.message || t('mm_add_month_err_op', "Operation failed"));
         }
     };
 
@@ -87,19 +89,20 @@ export function AddMonthModal({ isOpen, onClose, onSuccess, initialData }: Props
             <div className="modal">
                 <div className="modal-head">
                     <h3 className="modal-title">
-                        {initialData ? "✏️ Edit Month" : "📅 Start New Month"}
+                        {/* 👇 ترجمة العناوين */}
+                        {initialData ? t('mm_add_month_edit_title', "✏️ Edit Month") : t('mm_add_month_new_title', "📅 Start New Month")}
                     </h3>
-                    <button onClick={onClose} className="small-btn">✕</button>
+                    <button onClick={onClose} className="small-btn" title={t('comm_cancel_btn', 'Cancel')}>✕</button>
                 </div>
 
                 {error && <div className="auth-error">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="auth-form" style={{ marginTop: '20px' }}>
 
-                    {/* 👇 الحقل الجديد: يختار السنة والشهر معاً */}
                     <div className="auth-field">
                         <label className="muted small" style={{ marginBottom: '5px', display: 'block' }}>
-                            Select Month & Year
+                            {/* 👇 ترجمة تسمية حقل التاريخ */}
+                            {t('mm_add_month_select_label', "Select Month & Year")}
                         </label>
                         <input
                             type="month"
@@ -107,13 +110,11 @@ export function AddMonthModal({ isOpen, onClose, onSuccess, initialData }: Props
                             value={dateValue}
                             onChange={(e) => setDateValue(e.target.value)}
                             required
-                            // 👇 هذا هو السطر السحري
                             onClick={(e) => {
                                 try {
-                                    // هذه الدالة تجبر المتصفح على فتح التقويم فوراً عند الضغط
                                     e.currentTarget.showPicker();
                                 } catch (err) {
-                                    // في حال كان المتصفح قديماً جداً ولا يدعمها، لا تفعل شيئاً (سيعمل بشكل طبيعي)
+                                    // صامت
                                 }
                             }}
                             style={{
@@ -124,11 +125,14 @@ export function AddMonthModal({ isOpen, onClose, onSuccess, initialData }: Props
                     </div>
 
                     <div className="auth-field">
-                        <label className="muted small" style={{ marginBottom: '5px', display: 'block' }}>Total Income</label>
+                        <label className="muted small" style={{ marginBottom: '5px', display: 'block' }}>
+                            {/* 👇 ترجمة تسمية الدخل */}
+                            {t('mm_add_month_income_label', "Total Income")}
+                        </label>
                         <input
                             type="number"
                             className="auth-input"
-                            placeholder="e.g. 25000"
+                            placeholder={t('mm_add_month_income_placeholder', "e.g. 25000")}
                             value={income}
                             onChange={(e) => setIncome(e.target.value)}
                             required
@@ -137,10 +141,14 @@ export function AddMonthModal({ isOpen, onClose, onSuccess, initialData }: Props
 
                     <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
                         <button type="button" onClick={onClose} className="btn ghost" style={{ flex: 1 }}>
-                            Cancel
+                            {/* 👇 ترجمة زر الإلغاء */}
+                            {t('mm_add_month_cancel', "Cancel")}
                         </button>
                         <button type="submit" className="btn primary-btn" disabled={loading} style={{ flex: 1 }}>
-                            {loading ? "Saving..." : (initialData ? "Update" : "Save")}
+                            {/* 👇 ترجمة أزرار الحفظ */}
+                            {loading 
+                                ? t('mm_add_month_saving', "Saving...") 
+                                : (initialData ? t('mm_add_month_update', "Update") : t('mm_add_month_save', "Save"))}
                         </button>
                     </div>
                 </form>

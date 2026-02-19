@@ -18,12 +18,13 @@ export default function App() {
     <AuthProvider>
       <Router basename={baseUrl}>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          {/* 👇 1. المنصة (Nexovo) صارت هي الواجهة الرئيسية للموقع */}
+          <Route path="/" element={<CommunityPage />} />
+
+          {/* 👇 2. السيرة الذاتية صار إلها رابط فرعي فخم */}
+          <Route path="/cv" element={<HomePage />} />
 
           <Route path="/login" element={<LoginPage />} />
-
-          {/* Community - public (guests can view, logged-in can post) */}
-          <Route path="/community" element={<CommunityPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
           <Route
@@ -44,8 +45,6 @@ export default function App() {
           />
 
           <Route path="/admin" element={<AdminDashboard />} />
-
-
         </Routes>
       </Router>
     </AuthProvider>
