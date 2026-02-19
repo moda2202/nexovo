@@ -50,7 +50,7 @@ export default function LoginPage() {
             if (!response.ok) throw new Error(t('login_google_failed', "Google login failed. Please try again."));
             const data = await response.json();
             login(data.accessToken);
-            navigate("/community");
+            navigate("/");
         } catch (err: any) {
             setError(err.message || t('login_google_failed', "Google login failed. Please try again."));
         }
@@ -69,7 +69,7 @@ export default function LoginPage() {
             if (!response.ok) throw new Error(t('login_failed_msg', "Login failed! Check your email or password."));
             const data = await response.json();
             login(data.accessToken);
-            navigate("/community");
+            navigate("/");
         } catch (err: any) {
             setError(err.message);
         } finally {
